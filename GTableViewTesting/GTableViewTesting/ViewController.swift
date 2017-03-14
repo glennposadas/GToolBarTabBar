@@ -23,11 +23,25 @@ class ViewController: UIViewController {
     
     @IBAction func cancelApplications(_ sender: Any) {
         
-        let indexPaths = self.tableView.indexPathsForSelectedRows
+        guard let indexPaths = self.tableView.indexPathsForSelectedRows else { return }
         
-        for indexPath in indexPaths! {
-            print("SELECTED : \(indexPath.section)")
+        if indexPaths.count == self.data.count {
+            // delete all
+            self.data.removeAll()
+            self.tableView.reloadData()
+            return
         }
+        
+        self.tableView.beginUpdates()
+        for indexPath in indexPaths {
+            if !(self.data.count > indexPath.section) {
+                return
+            }
+            
+            self.data.remove(at: indexPath.section)
+            self.tableView.deleteSections([indexPath.section], with: .automatic)
+        }
+        self.tableView.endUpdates()
     }
     
     @IBAction func markAll(_ sender: Any) {
@@ -65,7 +79,7 @@ class ViewController: UIViewController {
         self.tabBarController?.tabBar.isHidden = false
         self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         
-        for x in 1...20 {
+        for x in 1...200 {
             self.data.append("\(x) -- \(Date())")
             self.tableView.reloadData()
         }
